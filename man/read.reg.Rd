@@ -4,12 +4,14 @@
 \alias{read.reg}
 \title{Read regression output}
 \usage{
-read.reg(filename, outdir = ".")
+read.reg(filename, outdir = ".", RData = TRUE)
 }
 \arguments{
 \item{filename}{The filename of the STATA log file}
 
-\item{outdir}{Directory for CSV output}
+\item{outdir}{Directory for output}
+
+\item{RData}{store output in RData}
 }
 \description{
 Reads STATA tables created by linear regressions. For

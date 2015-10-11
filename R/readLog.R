@@ -1,13 +1,14 @@
 #' Read tab
 #' 
-#' Reads STATA tables created by \code{tab x y`} and \code{tab x, sum(y)`}. For
-#' each \code{tab} command found, this function will create a CSV file. For this
-#' function to work there must be a statement \code{"di tab2csv filename.csv"}
-#' preceding every \code{tab} command.
+#' Reads STATA tables created by \code{tab x y} and \code{tab x, sum(y)}. For
+#' each \code{tab} command found, this function will create a CSV or RData file. 
+#' For this function to work there must be a statement 
+#' \code{di "tab2csv filename.csv"} preceding every \code{tab} command.
 #' 
 #' @param filename The filename of the STATA log file
-#' @param outdir Directory for CSV output
-read.tab = function(filename, outdir = ".") {
+#' @param outdir Directory for output
+#' @param RData store output in RData
+read.tab = function(filename, outdir = ".", RData = FALSE) {
     
     if (!file.exists(filename)) {
         stop("File ", filename, " does not exist.")
@@ -37,31 +38,42 @@ read.tab = function(filename, outdir = ".") {
                 rX = rX + 1
                 next
             }
-            
-            tab.matrix.csv = paste0(gsub("tab2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".csv")
+            if(RData) {
+                tab.matrix.csv = paste0(gsub("tab2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".RData")
+            } else {
+                tab.matrix.csv = paste0(gsub("tab2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".csv")
+            }
                 
             # this line contains the label of y
-            while(length(grep(".+(Total|Freq\\.)", source.str[rX])) == 0) {
+            while(length(grep(".+((Total)|(Freq\\.))", source.str[rX])) == 0) {
                 rX = rX + 1
             }
             
             # find the delimiter
-            delimiter = gsub(".+(Total|Freq\\.)", "\\1", source.str[rX])
+            delimiter = gsub(".+((Total)|(Freq\\.))", "\\1", source.str[rX])
             
             # take a peek two rows below for the number of columns
             tab.matrix.ncol = length(strsplit(gsub(",", "", trim(strsplit(source.str[rX+2], "\\Q|\\E")[[1]][2]), fixed = TRUE), split = "[ ]+")[[1]])
             
             # extract labelString
             labelString = trim(strsplit(source.str[rX], "\\Q|\\E")[[1]][2])
-            tab.matrix.colnames = NULL
-            # create column labels (that are of length 10)
-            for (cX in 1:(tab.matrix.ncol)) {
-                tab.matrix.colnames = c(tab.matrix.colnames,
-                                        trim(str_sub(labelString, start = (cX - 1)*11 + 1, end = cX*11)))
+            if(labelString == "Mean   Std. Dev.       Freq.") {
+                tab.matrix.colnames = c("Means", "Std. Dev.", "Freq.")
+            } else if (labelString == "N      mean        sd       p25       p50       p75") {
+                tab.matrix.colnames = c("N", "mean", "sd", "p25", "p50", "p75")
+            } else {
+                tab.matrix.colnames = NULL
+                # create column labels (that are of length 10)
+                for (cX in 1:(tab.matrix.ncol)) {
+                    tab.matrix.colnames = c(tab.matrix.colnames,
+                                            trim(str_sub(labelString, start = (cX - 1)*11 + 1, end = cX*11)))
+                }
+                
+                if(length(strsplit(source.str[rX], "\\Q|\\E")[[1]]) == 3) {
+                    tab.matrix.colnames = c(tab.matrix.colnames, str_replace(delimiter, "\\.", ""))
+                }
+                
             }
-            
-            tab.matrix.colnames = c(tab.matrix.colnames, str_replace(delimiter, "\\.", ""))
-            
             rm(labelString)
             
             # skip the next line
@@ -77,7 +89,7 @@ read.tab = function(filename, outdir = ".") {
                 # assign first element to rownames
                 tab.matrix.rownames = c(tab.matrix.rownames, row[1])
                 # assign middle element to content
-                tab.matrix.content = c(tab.matrix.content, unlist(strsplit(gsub("[^ a-z0-9-_]+", "\\1", row[2:3], perl = TRUE), split = "[ ]+")))
+                tab.matrix.content = c(tab.matrix.content, unlist(strsplit(gsub("[^ a-z0-9-_.]+", "\\1", row[-1], perl = TRUE), split = "[ ]+")))
                 # increment row counter
                 rX = rX + 1
             }
@@ -88,7 +100,11 @@ read.tab = function(filename, outdir = ".") {
                 nrow = length(tab.matrix.rownames), ncol = length(tab.matrix.colnames)
             )
             if (!is.null(tab.matrix.csv)) {
-                write.csv(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                if(RData) {
+                    save(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                } else {
+                    write.csv(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                }
                 print(paste("Created", tab.matrix.csv))
             }
             
@@ -103,14 +119,15 @@ read.tab = function(filename, outdir = ".") {
 
 #' Read tabstat
 #' 
-#' Reads STATA tables created by \code{tabstat y, by(x)`}. For each \code{tab} 
-#' command found, this function will create a CSV file. For this function to
-#' work there must be a statement \code{"di tabstat2csv filename.csv"}
+#' Reads STATA tables created by \code{tabstat y, by(x)}. For each \code{tab} 
+#' command found, this function will create a CSV or RData file. For this function to
+#' work there must be a statement \code{di "tabstat2csv filename.csv"}
 #' preceding every \code{tabstat} command.
 #' 
 #' @param filename The filename of the STATA log file
-#' @param outdir Directory for CSV output
-read.tabstat = function(filename, outdir = ".") {
+#' @param outdir Directory for output
+#' @param RData store output in RData
+read.tabstat = function(filename, outdir = ".", RData = FALSE) {
     
     if (!file.exists(filename)) {
         stop("File ", filename, " does not exist.")
@@ -141,7 +158,11 @@ read.tabstat = function(filename, outdir = ".") {
                 next
             }
             
-            tab.matrix.csv = paste0(gsub("tabstat2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".csv")
+            if(RData) {
+                tab.matrix.csv = paste0(gsub("tabstat2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".RData")
+            } else {
+                tab.matrix.csv = paste0(gsub("tabstat2csv[ ](using |)+([a-zA-Z0-9_-]+).csv.*", "\\2", source.str[rX], perl = TRUE), ".csv")
+            }
             
             # find the separator line -----
             nX = 1
@@ -189,14 +210,23 @@ read.tabstat = function(filename, outdir = ".") {
                 # increment row counter
                 rX = rX + 1
             }
+            
+            # replace . by zero
+            tab.matrix.content[tab.matrix.content=="."] = 0
+            
             # create matrix
             tab.matrix = matrix(
+                # make matrix
                 as.numeric(tab.matrix.content), byrow = TRUE, dimnames = list(rownames = tab.matrix.rownames,
                                                                               colnames = tab.matrix.colnames),
                 nrow = length(tab.matrix.rownames), ncol = length(tab.matrix.colnames)
             )
             if (!is.null(tab.matrix.csv)) {
-                write.csv(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                if(RData) {
+                    save(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))   
+                } else {
+                    write.csv(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                }
                 print(paste("Created", tab.matrix.csv))
             }
             
@@ -216,11 +246,16 @@ read.tabstat = function(filename, outdir = ".") {
 #' file that contains the list \code{tab.reg} with the regression output.
 #' 
 #' @param filename The filename of the STATA log file
-#' @param outdir Directory for CSV output
-read.reg = function(filename, outdir = ".") {
+#' @param outdir Directory for output
+#' @param RData store output in RData
+read.reg = function(filename, outdir = ".", RData = TRUE) {
     
     if (!file.exists(filename)) {
         stop("File ", filename, " does not exist.")
+    }
+    
+    if(!RData) {
+        warning("RData = FALSE not (yet) supported.")
     }
     
     source.str = readLines(filename)
@@ -315,4 +350,10 @@ read.reg = function(filename, outdir = ".") {
 #' @return A string without whitespaces at the beginning and end.
 trim = function(x) {
     gsub("^\\s+|\\s+$", "", x)
+}
+
+#' helper function that loads a specific file and returns the variables therein
+load.RData <- function(fileName){
+    load(fileName)
+    data.frame(get(ls()[ls() != "fileName"]))
 }

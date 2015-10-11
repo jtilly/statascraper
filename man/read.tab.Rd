@@ -4,17 +4,19 @@
 \alias{read.tab}
 \title{Read tab}
 \usage{
-read.tab(filename, outdir = ".")
+read.tab(filename, outdir = ".", RData = FALSE)
 }
 \arguments{
 \item{filename}{The filename of the STATA log file}
 
-\item{outdir}{Directory for CSV output}
+\item{outdir}{Directory for output}
+
+\item{RData}{store output in RData}
 }
 \description{
-Reads STATA tables created by \code{tab x y`} and \code{tab x, sum(y)`}. For
-each \code{tab} command found, this function will create a CSV file. For this
-function to work there must be a statement \code{"di tab2csv filename.csv"}
-preceding every \code{tab} command.
+Reads STATA tables created by \code{tab x y} and \code{tab x, sum(y)}. For
+each \code{tab} command found, this function will create a CSV or RData file.
+For this function to work there must be a statement
+\code{di "tab2csv filename.csv"} preceding every \code{tab} command.
 }
 
