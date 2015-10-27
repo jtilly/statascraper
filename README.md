@@ -61,4 +61,4 @@ head(load.RData("tab.RData"))
 #> BMW 320i           0       1     1
 ```
 
-A complete example can be found [here](demo/scraper.R) with corresponding [STATA do-file](inst/example/stata.do) and [STATA logfile](inst/example/test.log).
+A complete example can be found [here](https://github.com/jtilly/statascraper/blob/master/demo/statascraper.R) with corresponding [STATA do-file](https://github.com/jtilly/statascraper/blob/master/inst/example/stata.do) and [STATA logfile](https://github.com/jtilly/statascraper/blob/master/inst/example/test.log).
