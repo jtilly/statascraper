@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  /home/jtilly/statascraper/inst/example/test.log
+       log:  test.log
   log type:  text
  opened on:  27 Oct 2015, 11:45:01
 
@@ -224,7 +224,7 @@ list2r list.RData
 . 
 . log close
       name:  <unnamed>
-       log:  /home/jtilly/statascraper/inst/example/test.log
+       log:  test.log
   log type:  text
  closed on:  27 Oct 2015, 11:45:01
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
