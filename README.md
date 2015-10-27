@@ -12,7 +12,7 @@ devtools::install_github("jtilly/statascraper")
 
 ## Example
 
-Suppose you have the following Stata do file:
+Suppose you have the following STATA do file:
 
 ``` stata
 log using "test.log", replace
@@ -30,7 +30,7 @@ list price mpg
 log close
 ```
 
-Note that we use Stata's display command `di` before `tab`, `tabstat`, and `list` to place markers in the logfile that tell `statascraper` which tables to scrape and where to store the resulting `RData` or `csv` files. 
+Note that we use STATA's display command `di` before `tab`, `tabstat`, and `list` to place markers in the logfile that tell `statascraper` which tables to scrape and where to store the resulting `RData` or `csv` files. 
 
 We now use `statascraper` to scrape the resulting [log file](https://github.com/jtilly/statascraper/blob/master/inst/example/test.log) so that we can use `R` to process the results.
 
