@@ -1,5 +1,4 @@
-# statascraper
-[![Build Status](https://travis-ci.org/jtilly/statascraper.svg?branch=master)](https://travis-ci.org/jtilly/statascraper)
+# statascraper [![Build Status](https://travis-ci.org/jtilly/statascraper.svg?branch=master)](https://travis-ci.org/jtilly/statascraper)
 
 R Package that extracts tables from STATA log files
 
