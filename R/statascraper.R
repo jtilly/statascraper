@@ -1,0 +1,30 @@
+#' @name statascraper-package
+#' @docType package
+#' @title statascraper is an R package that extracts tables from STATA log files
+#' @description This package scrapes STATA log files, looks for tables generated
+#'   by tab, tabstat, list, reg, and areg and then returns these tables as R
+#'   matrices or stores them as comma separated value files. This package can be
+#'   useful, when researchers (have to) use STATA to work with data sets but
+#'   want to use R to analyze and display results.
+#' @author Jan Tilly
+#' @examples
+#' # In this example, we scrape the Stata log file "test.log" that was created
+#' # by "stata.do"
+#'
+#' # point to stata log file
+#' logfile = paste(system.file("example", package = "statascraper"),
+#'                 "test.log", sep = .Platform$file.sep)
+#'
+#' # read tab commands
+#' read.tab(filename = logfile, outdir = ".", RData = TRUE, tag = "tab2r")
+#' head(load.RData("tab.RData"))
+#' head(load.RData("tabsum.RData"))
+#'
+#' # read tabstat commands
+#' read.tabstat(filename = logfile, outdir = ".", RData = TRUE, tag = "tabstat2r")
+#' head(load.RData("tabstat.RData"))
+#'
+#' # read list commands
+#' read.list(filename = logfile, outdir = ".", RData = TRUE, tag = "list2r")
+#' head(load.RData("list.RData"))
+NULL

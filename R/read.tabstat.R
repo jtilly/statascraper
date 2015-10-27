@@ -8,8 +8,7 @@
 #' @param filename The filename of the STATA log file
 #' @param outdir Directory for output
 #' @param RData store output in RData
-#' @param tag specifies what tag to look for in the Stata log file
-#' @param tag specifies what tag to look for in the Stata log file
+#' @param tag specifies what tag to look for in the STATA log file
 read.tabstat = function(filename, outdir = ".", RData = FALSE, tag = "tabstat2csv") {
 
     if (!file.exists(filename)) {
