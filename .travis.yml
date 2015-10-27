@@ -21,6 +21,8 @@ addons:
     - r-base-dev
     - r-recommended
     - pandoc
+    - texlive-full 
+    - texlive-xetex
 
 # cache local R libraries directory:
 cache:
