@@ -40,8 +40,15 @@ read.list = function(filename, outdir = ".", RData = FALSE, tag = "list2csv") {
                 list.matrix.csv = paste0(gsub(paste0(tag, "[ ](using |)+([a-zA-Z0-9_-]+).(csv|RData).*"), "\\2", source.str[rX], perl = TRUE), ".csv")
             }
 
-            # skip the next two lines
-            rX = rX + 3
+            # skip lines until we get to the table header
+            while (TRUE) {
+                rX = rX + 1
+                if (str_sub(trim(source.str[rX]), 1, 6) == "+-----") {
+                    break
+                }
+            }
+
+            rX = rX + 1
 
             # this line contains the variable names
             list.matrix.colnames = unlist(str_split(trim(str_replace_all(source.str[rX], "\\|", "")), "[ ]+"))
