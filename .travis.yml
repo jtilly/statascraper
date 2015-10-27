@@ -23,6 +23,14 @@ addons:
     - pandoc
     - texlive-full 
     - texlive-xetex
+    - aspell 
+    - aspell-en
+
+# set global environmental variable
+env:
+  global:
+   - _R_CHECK_CRAN_INCOMING_USE_ASPELL_=TRUE
+   - _R_CHECK_CRAN_INCOMING_=FALSE
 
 # cache local R libraries directory:
 cache:
@@ -48,7 +56,7 @@ install:
 
 # Build and check package
 script:
-  - R CMD build . --no-build-vignettes --no-manual
+  - R CMD build . --no-build-vignettes
   - PKG_FILE_NAME=$(ls -1t *.tar.gz | head -n 1)
   - R CMD check "${PKG_FILE_NAME}" --no-build-vignettes --as-cran
 
