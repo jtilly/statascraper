@@ -44,7 +44,7 @@ tab2r tab.RData
 ...
 ```
 
-We now use `statascraper` to retrieve the tabulated output in R. Note that we use STATA's display command `di` to place markers in the logfile that tell `statascraper` which tables to scrape and where to store the resulting RData or csv files. For instance, `tab2r tab.RData` tells the scraper to scrape the results from tab and store them in the file `tab.RData`. 
+We now use `statascraper` to access the tabulated output from R. Note that we use STATA's display command `di` to place markers in the logfile that tell `statascraper` which tables to scrape and where to store the resulting RData or csv files. For instance, `tab2r tab.RData` tells the scraper to scrape the results from tab and store them in the file `tab.RData`. 
 
 ``` r
 library("statascraper")
