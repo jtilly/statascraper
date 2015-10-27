@@ -31,9 +31,30 @@ list price mpg
 log close
 ```
 
+This do file produces a log file that looks like this:
+
+```
+. di "tab2r tab.RData"
+tab2r tab.RData
+
+. tab make foreign
+
+                   |       Car type
+    Make and Model |  Domestic    Foreign |     Total
+-------------------+----------------------+----------
+       AMC Concord |         1          0 |         1 
+         AMC Pacer |         1          0 |         1 
+        AMC Spirit |         1          0 |         1 
+         Audi 5000 |         0          1 |         1 
+          Audi Fox |         0          1 |         1 
+          BMW 320i |         0          1 |         1 
+     Buick Century |         1          0 |         1 
+...
+```
+
 Note that we use STATA's display command `di` before `tab`, `tabstat`, and `list` to place markers in the logfile that tell `statascraper` which tables to scrape and where to store the resulting `RData` or `csv` files. For instance, `tab2r tab.RData` tells the scraper to scrape the results from `tab` and store them in the file `tab.RData`. 
 
-We now use `statascraper` to scrape the resulting [log file](https://github.com/jtilly/statascraper/blob/master/inst/example/test.log) so that we can use `R` to process the results.
+We now use `statascraper` to scrape the resulting [log file](https://github.com/jtilly/statascraper/blob/master/inst/example/test.log) so that we can use `R` to process the results. 
 
 ``` r
 # scraper.R
