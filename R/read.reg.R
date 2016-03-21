@@ -98,3 +98,84 @@ read.reg = function(filename, outdir = ".", RData = TRUE) {
     }
 
 }
+
+
+
+read.regout = function(filename, outdir = ".", RData = FALSE, tag = "regout2csv") {
+    
+    if (!file.exists(filename)) {
+        stop("File ", filename, " does not exist.")
+    }
+    
+    source.str = readLines(filename)
+    
+    # loop through all the lines
+    rX = 1
+    while (rX <= length(source.str)) {
+        
+        tab.matrix = NULL
+        tab.matrix.content = NULL
+        tab.matrix.colnames = NULL
+        tab.matrix.rownames = NULL
+        tab.matrix.csv = NULL
+        
+        # find the tag
+        if (str_sub(source.str[rX], 1, str_length(tag)) == tag) {
+            
+            # skip if no obs
+            if (any(source.str[rX + (1:5)] == "no observations"))  {
+                rX = rX + 1
+                next
+            }
+            if (RData) {
+                tab.matrix.csv = paste0(gsub(paste0(tag, "[ ](using |)+([a-zA-Z0-9_-]+).(csv|RData).*"), "\\2", source.str[rX], perl = TRUE), ".RData")
+            } else {
+                tab.matrix.csv = paste0(gsub(paste0(tag, "[ ](using |)+([a-zA-Z0-9_-]+).(csv|RData).*"), "\\2", source.str[rX], perl = TRUE), ".csv")
+            }
+            
+            # this line contains the label of y
+            while (substr(source.str[rX], 0, 10) != "----------") {
+                rX = rX + 1
+            }
+            
+            # take a peek two rows below for the number of columns
+            tab.matrix.ncol = 2
+            tab.matrix.colnames = c("estimates", "se")
+            
+            rX = rX + 1
+            tab.matrix.content = NULL
+            
+            # read data
+            while (TRUE) {
+                if (source.str[rX] == "") {
+                    break
+                }
+                # get rid of everthing that is not alpha:numeric and put into a row vector
+                row = trim(strsplit(source.str[rX], "\\Q|\\E")[[1]])
+                # assign middle element to content
+                tab.matrix.content = c(tab.matrix.content, unlist(strsplit(gsub("[^ a-z0-9-_.]+", "\\1", row[-1], perl = TRUE), split = "[ ]+")))
+                # increment row counter
+                rX = rX + 1
+            }
+            # create matrix
+            tab.matrix = matrix(
+                as.numeric(tab.matrix.content), byrow = TRUE, dimnames = list(rownames = tab.matrix.rownames,
+                                                                              colnames = tab.matrix.colnames),
+                ncol = length(tab.matrix.colnames)
+            )
+            if (!is.null(tab.matrix.csv)) {
+                if (RData) {
+                    save(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                } else {
+                    write.csv(tab.matrix, file = paste0(outdir, .Platform$file.sep, tab.matrix.csv))
+                }
+                print(paste("Created", tab.matrix.csv))
+            }
+            
+        }
+        
+        rX = rX + 1
+    }
+    
+    
+}
